@@ -240,7 +240,7 @@ body {
 </header>
 
 <div class="deadline-banner">
-  ⏰ Valores válidos para inscrições até <strong>27 de abril de 2026</strong> · Sistema encerra automaticamente · Reabertura 28/07 com valores atualizados
+  ⏰ Valores válidos para inscrições até <strong>27 de abril de 2026</strong> · Sistema encerra automaticamente · Reabertura 28/04 com valores atualizados
 </div>
 
 <div class="container">
@@ -488,7 +488,7 @@ body {
             </div>
             <div class="qty-controls">
               <button class="qty-btn" onclick="changeQty('far3',-1)">−</button>
-              <span class="qty-val" id="far3Val">0</span>
+     0        <span class="qty-val" id="far3Val">0</span>
               <button class="qty-btn" onclick="changeQty('far3',1)">+</button>
             </div>
           </div>
@@ -753,7 +753,6 @@ function updateTotals(){
   var totFar = 0;
   if (state.farellones==='sim'&&state.clpRate>0)
     totFar = (q.far1*26000 + q.far2*61000 + q.far3*87000) * state.clpRate;
-
   state.totalPasseios=totD1+totD2; state.totalIngressos=totFar; state.totalGeral=totD1+totD2+totFar;
   var fmt=function(v){ return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); };
   var d1n={opt1:'Viña + Valparaíso',opt2:'Cousiño Macul + Alyan'};
@@ -762,7 +761,7 @@ function updateTotals(){
   document.getElementById('totD2Label').textContent=d2n[state.dia2]||'—';
   document.getElementById('totD1').textContent=fmt(totD1);
   document.getElementById('totD2').textContent=fmt(totD2);
-  document.getElementById('totFarRow').style.display=state.farellones==='sim'?'flex':'none';
+  document.getElemenntById('totFarRow').style.display=state.farellones==='sim'?'flex':'none';
   document.getElementById('totFar').textContent=fmt(totFar);
   document.getElementById('totGeral').textContent=fmt(state.totalGeral);
   if (state.deposit) selectDeposit(state.deposit);
