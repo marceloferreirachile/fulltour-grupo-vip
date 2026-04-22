@@ -426,6 +426,10 @@ body {
             <button class="qty-btn" onclick="changeQty('d2kids',1)">+</button>
           </div>
         </div>
+        <div id="d2-safari-note" style="display:none;margin-top:8px;background:#eaf4fb;border-left:3px solid #2196F3;border-radius:6px;padding:10px 12px;font-size:13px;color:#333;line-height:1.6;">
+          🦁 <strong>Safari:</strong> Entradas incluídas (geral + herbívoros + felinos). Atividades extras por conta do cliente.<br>
+          🏙️ <strong>KidZania:</strong> Entradas <strong>não incluídas</strong> — consultar Álvaro.
+        </div>
       </div>
 
       <!-- Farellones -->
@@ -807,6 +811,8 @@ function updateStep4Labels(){
   document.getElementById('d2kids-row').style.opacity = d2opt2?'0.4':'1';
   document.querySelectorAll('#d2kids-row .qty-btn').forEach(function(b){ b.disabled = d2opt2; b.style.cursor = d2opt2?'not-allowed':'pointer'; });
   if(d2opt2){ state.qtd.d2kids=0; document.getElementById('d2kidsVal').textContent='0'; }
+  // Aviso Safari/KidZania — visível apenas na opt1
+  document.getElementById('d2-safari-note').style.display = d2opt2?'none':'block';
 
   document.getElementById('alyanSection').style.display = d1opt2?'block':'none';
 }
