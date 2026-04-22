@@ -133,6 +133,7 @@ function doPost(e) {
       .setMimeType(ContentService.MimeType.JSON);
 
   } catch (err) {
+    console.error('doPost ERROR:', err.message || err.toString(), 'Stack:', err.stack || 'N/A');
     return ContentService
       .createTextOutput(JSON.stringify({ success: false, error: err.toString() }))
       .setMimeType(ContentService.MimeType.JSON);

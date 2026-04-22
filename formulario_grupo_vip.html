@@ -450,7 +450,8 @@ body {
         <!-- Pessoas no passeio (tour) -->
         <div style="background:var(--teal-light);border:1px solid rgba(17,161,167,0.35);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
           <div style="font-size:13px;font-weight:700;color:#0a5a5e;margin-bottom:10px;">🚌 Passeio Farellones — Quantas pessoas vão?</div>
-          <div style="font-size:11.5px;color:#0a6f73;margin-bottom:12px;line-height:1.4;">Valor do passeio (transporte + guia): <strong>R$ 338,00 por pessoa</strong> — mesmo valor para adultos e crianças.</div>
+          <div style="font-size:11.5px;color:#0a6f73;margin-bottom:8px;line-height:1.4;">Valor do passeio (transporte + guia): <strong>R$ 338,00 por pessoa</strong> — mesmo valor para adultos e crianças.</div>
+          <div style="font-size:11px;color:#5a7a7c;background:rgba(255,255,255,0.55);border-radius:7px;padding:7px 10px;margin-bottom:12px;line-height:1.5;">🧥 <strong>Roupa de neve não incluída</strong> — o passeio contempla parada para quem precisar alugar (valor não incluído).</div>
           <div class="qty-group" style="margin-bottom:0;">
             <div class="qty-row">
               <div><span class="qty-label">Total de pessoas</span><span class="qty-sub">Inclui adultos e crianças</span></div>
@@ -795,9 +796,19 @@ function updateStep4Labels(){
   var d2m={opt1:'Safari + KidZania',opt2:'VIK + Montes'};
   document.getElementById('d1label').textContent = d1m[state.dia1]||'—';
   document.getElementById('d2label').textContent = d2m[state.dia2]||'—';
-  document.getElementById('d1kids-row').style.opacity = state.dia1==='opt2'?'0.4':'1';
-  document.getElementById('d2kids-row').style.opacity = state.dia2==='opt2'?'0.4':'1';
-  document.getElementById('alyanSection').style.display = state.dia1==='opt2'?'block':'none';
+  // Crianças Dia 1 — desabilitar botões se opt2
+  var d1opt2 = state.dia1==='opt2';
+  document.getElementById('d1kids-row').style.opacity = d1opt2?'0.4':'1';
+  document.querySelectorAll('#d1kids-row .qty-btn').forEach(function(b){ b.disabled = d1opt2; b.style.cursor = d1opt2?'not-allowed':'pointer'; });
+  if(d1opt2){ state.qtd.d1kids=0; document.getElementById('d1kidsVal').textContent='0'; }
+
+  // Crianças Dia 2 — desabilitar botões se opt2
+  var d2opt2 = state.dia2==='opt2';
+  document.getElementById('d2kids-row').style.opacity = d2opt2?'0.4':'1';
+  document.querySelectorAll('#d2kids-row .qty-btn').forEach(function(b){ b.disabled = d2opt2; b.style.cursor = d2opt2?'not-allowed':'pointer'; });
+  if(d2opt2){ state.qtd.d2kids=0; document.getElementById('d2kidsVal').textContent='0'; }
+
+  document.getElementById('alyanSection').style.display = d1opt2?'block':'none';
 }
 
 // ── Totais ─────────────────────────────────────────────────────
