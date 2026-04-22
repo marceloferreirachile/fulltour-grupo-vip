@@ -17,7 +17,7 @@
 
 // ── CONFIGURAÇÕES ──────────────────────────────────────────────
 var CONFIG = {
-  email_marcelo:   "marcelo@fulltour.com.br",
+  email_marcelo:   "marcelobrachile@gmail.com",
   nome_remetente:  "Full Tour — Grupo VIP",
   sheet_name:      "Inscrições",       // nome da aba na planilha
   prazo_limite:    "27/06/2026",
@@ -26,42 +26,44 @@ var CONFIG = {
 
 // Colunas da planilha (ordem das colunas, começando em 1)
 var COLS = {
-  id:           1,
-  timestamp:    2,
-  nome:         3,
-  email:        4,
-  whatsapp:     5,
-  dia1_opcao:   6,
-  dia1_adultos: 7,
-  dia1_criancas:8,
-  dia2_opcao:   9,
-  dia2_adultos: 10,
-  dia2_criancas:11,
-  farellones:   12,
-  far_gratuito: 13,
-  far_crianca:  14,
-  far_adulto_geral: 15,
-  far_adulto_ski:   16,
-  clp_cotacao:  17,
-  alyan:        18,
-  total_passeios:  19,
-  total_ingressos: 20,
-  total_geral:  21,
-  pct_entrada:  22,
-  valor_entrada:23,
-  saldo:        24,
-  pagamento:    25,
-  status:       26,
-  data_confirmacao: 27,
-  observacoes:  28,
+  id:               1,
+  timestamp:        2,
+  nome:             3,
+  email:            4,
+  whatsapp:         5,
+  dia1_opcao:       6,
+  dia1_adultos:     7,
+  dia1_criancas:    8,
+  dia2_opcao:       9,
+  dia2_adultos:     10,
+  dia2_criancas:    11,
+  farellones:       12,
+  far_tour_pessoas: 13,  // total de pessoas no passeio (tour R$338/px)
+  far_gratuito:     14,
+  far_crianca:      15,
+  far_adulto_geral: 16,
+  far_adulto_ski:   17,
+  far_pagamento:    18,  // PIX via Full Tour / Compra direta no parque
+  clp_cotacao:      19,
+  alyan:            20,
+  total_passeios:   21,
+  total_ingressos:  22,
+  total_geral:      23,
+  pct_entrada:      24,
+  valor_entrada:    25,
+  saldo:            26,
+  pagamento:        27,
+  status:           28,
+  data_confirmacao: 29,
+  observacoes:      30,
 };
 
 // ── CABEÇALHOS ─────────────────────────────────────────────────
 var HEADERS = [
   "ID", "Data/Hora", "Nome", "E-mail", "WhatsApp",
-  "Dia 1 — 28/06", "Adultos Dia 1", "Crianças Dia 1",
-  "Dia 2 — 29/06", "Adultos Dia 2", "Crianças Dia 2",
-  "Farellones", "Far. Gratuito", "Far. Criança", "Far. Adulto Geral", "Far. Adulto Ski",
+  "Dia 1 — 28/07", "Adultos Dia 1", "Crianças Dia 1",
+  "Dia 2 — 29/07", "Adultos Dia 2", "Crianças Dia 2",
+  "Dia 3 — Farellones (30/07)", "Far. Pessoas (Tour)", "Far. Gratuito", "Far. Criança", "Far. Adulto Geral", "Far. Adulto Ski", "Far. Pagamento",
   "Cotação CLP", "Ticket Alyan",
   "Total Passeios R$", "Total Ingressos R$", "Total Geral R$",
   "% Entrada", "Valor Entrada R$", "Saldo R$",
@@ -100,10 +102,12 @@ function doPost(e) {
     row[COLS.dia2_adultos - 1]     = parseInt(data.dia2_adultos) || 0;
     row[COLS.dia2_criancas - 1]    = parseInt(data.dia2_criancas) || 0;
     row[COLS.farellones - 1]       = data.farellones || "Não";
+    row[COLS.far_tour_pessoas - 1] = parseInt(data.far_tour_pessoas) || 0;
     row[COLS.far_gratuito - 1]     = parseInt(data.far_gratuito) || 0;
     row[COLS.far_crianca - 1]      = parseInt(data.far_crianca) || 0;
     row[COLS.far_adulto_geral - 1] = parseInt(data.far_adulto_geral) || 0;
     row[COLS.far_adulto_ski - 1]   = parseInt(data.far_adulto_ski) || 0;
+    row[COLS.far_pagamento - 1]    = data.far_pagamento || "N/A";
     row[COLS.clp_cotacao - 1]      = parseFloat(data.clp_cotacao) || 0;
     row[COLS.alyan - 1]            = data.alyan || "N/A";
     row[COLS.total_passeios - 1]   = parseFloat(data.total_passeios) || 0;
@@ -172,7 +176,7 @@ function configurarPlanilha(ws) {
   ws.setFrozenRows(3);
 
   // Larguras das colunas
-  var widths = [50,140,200,220,130,220,90,90,220,90,90,90,80,80,100,100,90,180,
+  var widths = [50,140,200,220,130,220,90,90,220,90,90,140,90,80,80,100,100,150,90,180,
                 110,110,110,90,110,110,130,130,130,250];
   for (var i = 0; i < widths.length && i < HEADERS.length; i++) {
     ws.setColumnWidth(i + 1, widths[i]);
@@ -180,7 +184,7 @@ function configurarPlanilha(ws) {
 
   // Validação dropdown STATUS
   var statusRule = SpreadsheetApp.newDataValidation()
-    .requireValueInList(["⏳ Aguardando", "✅ Confirmado", "❌ Cancelado"], true)
+    .requireValueInList(["⏳ Aguardando", "✅ Entrada paga", "🎉 Concluído", "❌ Cancelado"], true)
     .build();
   ws.getRange(4, COLS.status, 500, 1).setDataValidation(statusRule);
 
@@ -219,21 +223,25 @@ function onEdit(e) {
   // Remove formatação anterior
   e.range.setBackground(null).setFontColor(null).setFontWeight(null);
 
-  if (val === "✅ Confirmado") {
-    e.range.setBackground("#e9f7ef").setFontColor("#27ae60").setFontWeight("bold");
-    // Registra data de confirmação
+  if (val === "✅ Entrada paga") {
+    e.range.setBackground("#e0f7f8").setFontColor("#0a6f73").setFontWeight("bold");
     ws.getRange(row, COLS.data_confirmacao).setValue(new Date());
-    // Envia e-mail de confirmação ao cliente
-    var emailCell = ws.getRange(row, COLS.email).getValue();
-    var nomeCell  = ws.getRange(row, COLS.nome).getValue();
-    var totalCell = ws.getRange(row, COLS.total_geral).getValue();
-    var saldoCell = ws.getRange(row, COLS.saldo).getValue();
-    var pagCell   = ws.getRange(row, COLS.pagamento).getValue();
-    if (emailCell) enviarEmailConfirmacao(emailCell, nomeCell, totalCell, saldoCell, pagCell);
+    var emailE = ws.getRange(row, COLS.email).getValue();
+    var nomeE  = ws.getRange(row, COLS.nome).getValue();
+    var totalE = ws.getRange(row, COLS.total_geral).getValue();
+    var saldoE = ws.getRange(row, COLS.saldo).getValue();
+    var pagE   = ws.getRange(row, COLS.pagamento).getValue();
+    if (emailE) enviarEmailEntradaPaga(emailE, nomeE, totalE, saldoE, pagE);
+
+  } else if (val === "🎉 Concluído") {
+    e.range.setBackground("#e9f7ef").setFontColor("#27ae60").setFontWeight("bold");
+    var emailC = ws.getRange(row, COLS.email).getValue();
+    var nomeC  = ws.getRange(row, COLS.nome).getValue();
+    var totalC = ws.getRange(row, COLS.total_geral).getValue();
+    if (emailC) enviarEmailConcluido(emailC, nomeC, totalC);
 
   } else if (val === "❌ Cancelado") {
     e.range.setBackground("#fdf0ef").setFontColor("#c0392b").setFontWeight("bold");
-    // Envia e-mail de cancelamento ao cliente
     var emailCel  = ws.getRange(row, COLS.email).getValue();
     var nomeCel   = ws.getRange(row, COLS.nome).getValue();
     var dia1Cel   = ws.getRange(row, COLS.dia1_opcao).getValue();
@@ -363,36 +371,7 @@ function enviarNotificacaoMarcelo(data, id) {
   });
 }
 
-// ── E-MAIL DE CONFIRMAÇÃO DE PAGAMENTO (disparado ao marcar ✅) ─
-function enviarEmailConfirmacao(email, nome, total, saldo, pagamento) {
-  var fmt = function(v) { return "R$ " + parseFloat(v || 0).toFixed(2).replace(".", ","); };
-  var html = '<div style="font-family:Segoe UI,Arial,sans-serif;max-width:560px;margin:0 auto;">'
-    + '<div style="background:#071a2e;padding:20px 28px;border-bottom:3px solid #11A1A7;">'
-    + '<span style="font-size:18px;font-weight:900;color:#fff;letter-spacing:2px;">FULL <span style="color:#11A1A7;">TOUR</span></span>'
-    + '</div>'
-    + '<div style="background:#fff;padding:28px;border:1px solid #eee;">'
-    + '<div style="text-align:center;margin-bottom:20px;">'
-    + '<div style="width:60px;height:60px;background:linear-gradient(135deg,#27ae60,#1e8449);border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:28px;">✓</div>'
-    + '<p style="font-size:20px;font-weight:800;color:#1a1a2e;margin:0;">Reserva confirmada!</p>'
-    + '</div>'
-    + '<p style="font-size:13px;color:#444;line-height:1.6;">Olá, <strong>' + nome + '</strong>! Seu pagamento foi confirmado e sua vaga está <strong>garantida</strong>. Nos vemos em junho! 🇨🇱</p>'
-    + (saldo > 0 ? '<div style="background:#fef5ec;border:1px solid #f0c090;border-radius:8px;padding:14px;margin-top:16px;">'
-    + '<p style="font-size:12px;color:#7a4000;margin:0;">💰 <strong>Saldo restante:</strong> ' + fmt(saldo) + ' — a ser pago até <strong>48h antes do primeiro passeio</strong> (26/06/2026).</p>'
-    + '</div>' : '')
-    + '<p style="font-size:12px;color:#888;margin-top:20px;">Qualquer dúvida, fale com a gente pelo WhatsApp!</p>'
-    + '</div>'
-    + '<div style="background:#f5f7fa;padding:14px;text-align:center;border-top:1px solid #eee;">'
-    + '<p style="font-size:10px;color:#aaa;margin:0;">Full Tour Chile · Atendimento 100% em Português</p>'
-    + '</div></div>';
-
-  MailApp.sendEmail({
-    to:       email,
-    subject:  "Full Tour Grupo VIP — Reserva confirmada! 🎉",
-    htmlBody: html,
-    name:     CONFIG.nome_remetente,
-    replyTo:  CONFIG.email_marcelo,
-  });
-}
+// (enviarEmailConfirmacao substituída por enviarEmailEntradaPaga + enviarEmailConcluido)
 
 // ── CANCELAMENTO AUTOMÁTICO (agendar para 27/06 às 23h) ────────
 // Para agendar: Apps Script → Acionadores → + Adicionar acionador
@@ -443,6 +422,77 @@ function executarCancelamentosAutomaticos() {
   Logger.log("Cancelamentos enviados: " + count);
 }
 
+// ── E-MAIL: ENTRADA PAGA — PRÉ-RESERVA CONFIRMADA ──────────────
+function enviarEmailEntradaPaga(email, nome, total, saldo, pagamento) {
+  var fmt = function(v) { return "R$ " + parseFloat(v || 0).toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, "."); };
+  var html = '<div style="font-family:Segoe UI,Arial,sans-serif;max-width:560px;margin:0 auto;background:#f0f2f5;">'
+    + '<div style="background:#071a2e;padding:20px 28px;border-bottom:3px solid #11A1A7;">'
+    + '<span style="font-size:18px;font-weight:900;color:#fff;letter-spacing:2px;">FULL <span style="color:#11A1A7;">TOUR</span></span>'
+    + '<span style="float:right;background:rgba(17,161,167,0.2);border:1px solid rgba(17,161,167,0.5);color:#b0f0f2;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;">GRUPO VIP 2026</span>'
+    + '</div>'
+    + '<div style="background:#ffffff;padding:28px 28px 20px;border-left:1px solid #dde;border-right:1px solid #dde;">'
+    + '<p style="font-size:21px;font-weight:800;color:#0a6f73;margin:0 0 6px;">Entrada confirmada! ✅</p>'
+    + '<p style="font-size:13px;color:#444;line-height:1.6;margin:0 0 22px;">Olá, <strong>' + nome + '</strong>! Recebemos seu sinal e sua <strong>pré-reserva está garantida</strong> no Grupo VIP Julho 2026. Fique tranquilo — sua vaga está assegurada!</p>'
+    + '</div>'
+    + '<div style="background:#f8f9fb;border:1px solid #dde;border-top:none;padding:22px 28px;">'
+    + '<p style="font-size:10.5px;font-weight:800;color:#0a6f73;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 14px;">💰 Situação do pagamento</p>'
+    + '<p style="font-size:13px;color:#222;margin:6px 0;"><strong>Total do pacote:</strong> ' + fmt(total) + '</p>'
+    + '<p style="font-size:13px;color:#27ae60;font-weight:700;margin:6px 0;">✅ Entrada paga: ' + fmt(parseFloat(total) - parseFloat(saldo)) + '</p>'
+    + (parseFloat(saldo) > 0
+      ? '<p style="font-size:13px;color:#e67e22;font-weight:700;margin:6px 0;">⏳ Saldo restante: ' + fmt(saldo) + '</p>'
+        + '<p style="font-size:12px;color:#666;margin:10px 0 0;">O saldo deverá ser pago até <strong>48h antes do primeiro passeio</strong> (26/07/2026).</p>'
+      : '')
+    + '<p style="font-size:12.5px;color:#444;margin:10px 0 0;"><strong>Forma de pagamento:</strong> ' + (pagamento || '—') + '</p>'
+    + '</div>'
+    + '<div style="background:#e0f7f8;border:1px solid rgba(17,161,167,0.3);border-top:none;padding:14px 28px;">'
+    + '<p style="font-size:12px;color:#0a5a5e;margin:0;">🏔️ Prepare-se para uma experiência incrível no Chile! Em breve entraremos em contato com os detalhes do roteiro e o link para o saldo restante.</p>'
+    + '</div>'
+    + '<div style="background:#071a2e;padding:12px;text-align:center;">'
+    + '<p style="font-size:10px;color:#8ab;margin:0;">Full Tour Chile · Atendimento 100% em Português · fulltour.com.br</p>'
+    + '</div></div>';
+
+  MailApp.sendEmail({
+    to:       email,
+    subject:  "Full Tour Grupo VIP — Pré-reserva confirmada! Entrada recebida ✅",
+    htmlBody: html,
+    name:     CONFIG.nome_remetente,
+    replyTo:  CONFIG.email_marcelo,
+  });
+}
+
+// ── E-MAIL: CONCLUÍDO — PAGAMENTO INTEGRAL ──────────────────────
+function enviarEmailConcluido(email, nome, total) {
+  var fmt = function(v) { return "R$ " + parseFloat(v || 0).toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, "."); };
+  var html = '<div style="font-family:Segoe UI,Arial,sans-serif;max-width:560px;margin:0 auto;background:#f0f2f5;">'
+    + '<div style="background:#071a2e;padding:20px 28px;border-bottom:3px solid #11A1A7;">'
+    + '<span style="font-size:18px;font-weight:900;color:#fff;letter-spacing:2px;">FULL <span style="color:#11A1A7;">TOUR</span></span>'
+    + '<span style="float:right;background:rgba(17,161,167,0.2);border:1px solid rgba(17,161,167,0.5);color:#b0f0f2;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;">GRUPO VIP 2026</span>'
+    + '</div>'
+    + '<div style="background:#ffffff;padding:28px 28px 20px;border-left:1px solid #dde;border-right:1px solid #dde;text-align:center;">'
+    + '<div style="width:64px;height:64px;background:linear-gradient(135deg,#27ae60,#1e8449);border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:30px;line-height:64px;">🎉</div>'
+    + '<p style="font-size:22px;font-weight:800;color:#1a1a2e;margin:0 0 8px;">Tudo pago, tudo certo!</p>'
+    + '<p style="font-size:13px;color:#444;line-height:1.6;margin:0;">Olá, <strong>' + nome + '</strong>! Seu pagamento integral foi confirmado. Sua reserva no <strong>Grupo VIP Julho 2026</strong> está 100% garantida. Nos vemos no Chile! 🇨🇱</p>'
+    + '</div>'
+    + '<div style="background:#e9f7ef;border:1px solid rgba(39,174,96,0.3);border-top:none;padding:20px 28px;text-align:center;">'
+    + '<p style="font-size:14px;font-weight:800;color:#27ae60;margin:0 0 6px;">✅ Pagamento integral: ' + fmt(total) + '</p>'
+    + '<p style="font-size:12px;color:#555;margin:0;">Você receberá em breve todas as informações do roteiro, horários e pontos de encontro.</p>'
+    + '</div>'
+    + '<div style="background:#ffffff;border:1px solid #dde;border-top:none;padding:14px 28px;">'
+    + '<p style="font-size:12px;color:#666;margin:0;">Dúvidas? Fale com a Full Tour pelo <a href="https://wa.me/56982050413" style="color:#0a6f73;font-weight:bold;">WhatsApp</a>.</p>'
+    + '</div>'
+    + '<div style="background:#071a2e;padding:12px;text-align:center;">'
+    + '<p style="font-size:10px;color:#8ab;margin:0;">Full Tour Chile · Atendimento 100% em Português · fulltour.com.br</p>'
+    + '</div></div>';
+
+  MailApp.sendEmail({
+    to:       email,
+    subject:  "Full Tour Grupo VIP — Pagamento integral confirmado! 🎉 Nos vemos no Chile!",
+    htmlBody: html,
+    name:     CONFIG.nome_remetente,
+    replyTo:  CONFIG.email_marcelo,
+  });
+}
+
 // ── E-MAIL DE CANCELAMENTO ──────────────────────────────────────
 function enviarEmailCancelamento(email, nome, dia1, dia2, farellones, total) {
   var fmt = function(v) { return "R$ " + parseFloat(v || 0).toFixed(2).replace(".", ","); };
@@ -484,4 +534,25 @@ function doGet(e) {
   return ContentService
     .createTextOutput(JSON.stringify({ status: "online", app: "Full Tour Grupo VIP" }))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ── CONFIGURA ACIONADORES AUTOMÁTICOS ──────────────────────────
+// Execute esta função UMA VEZ após implantar o script.
+// Ela agenda o cancelamento automático para 27/04/2026 às 23:00.
+function configurarAcionadores() {
+  // Remove acionadores anteriores para evitar duplicatas
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    if (t.getHandlerFunction() === 'executarCancelamentosAutomaticos') {
+      ScriptApp.deleteTrigger(t);
+    }
+  });
+
+  // Agenda cancelamento automático para 27/04/2026 às 23:00 (horário Chile/Santiago)
+  ScriptApp.newTrigger('executarCancelamentosAutomaticos')
+    .timeBased()
+    .at(new Date('2026-04-27T23:00:00'))
+    .create();
+
+  Logger.log('✅ Acionador configurado: cancelamento automático em 27/04/2026 às 23:00');
+  SpreadsheetApp.getUi().alert('✅ Acionador configurado!\n\nO cancelamento automático está agendado para 27/04/2026 às 23:00.\nTodos os status "Aguardando" serão cancelados e notificados automaticamente.');
 }

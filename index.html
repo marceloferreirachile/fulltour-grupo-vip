@@ -446,9 +446,26 @@ body {
 
       <!-- Ingressos Farellones por altura -->
       <div id="farTickets" style="display:none;">
+
+        <!-- Pessoas no passeio (tour) -->
+        <div style="background:var(--teal-light);border:1px solid rgba(17,161,167,0.35);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
+          <div style="font-size:13px;font-weight:700;color:#0a5a5e;margin-bottom:10px;">🚌 Passeio Farellones — Quantas pessoas vão?</div>
+          <div style="font-size:11.5px;color:#0a6f73;margin-bottom:12px;line-height:1.4;">Valor do passeio (transporte + guia): <strong>R$ 338,00 por pessoa</strong> — mesmo valor para adultos e crianças.</div>
+          <div class="qty-group" style="margin-bottom:0;">
+            <div class="qty-row">
+              <div><span class="qty-label">Total de pessoas</span><span class="qty-sub">Inclui adultos e crianças</span></div>
+              <div class="qty-controls">
+                <button class="qty-btn" onclick="changeQty('farPessoas',-1)">−</button>
+                <span class="qty-val" id="farPessoasVal">1</span>
+                <button class="qty-btn" onclick="changeQty('farPessoas',1)">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="field" style="margin-bottom:8px;">
-          <label>Ingressos Farellones — selecione por perfil/altura</label>
-          <div class="hint">O preço do ingresso é definido pela altura, não pela idade. Selecione a quantidade correta para cada perfil do seu grupo.</div>
+          <label>☃️ Ingressos do parque — selecione por perfil/altura</label>
+          <div class="hint">Os ingressos têm preço definido pela altura, não pela idade. São cobrados separadamente via link PIX. Selecione a quantidade correta para cada perfil.</div>
         </div>
         <div class="far-ticket-grid">
 
@@ -566,7 +583,8 @@ body {
         <div class="total-line"><span>Dia 1 — <span id="totD1Label">—</span></span><span class="val" id="totD1">R$ 0,00</span></div>
         <div class="total-line"><span>Dia 2 — <span id="totD2Label">—</span></span><span class="val" id="totD2">R$ 0,00</span></div>
         <div class="total-line" id="totAlyanRow" style="display:none;"><span>🍷 Alyan — Ingresso</span><span id="totAlyanLabel" style="font-size:11px;color:#a0d8db;font-style:italic;">Link PIX enviado separado ℹ️</span></div>
-        <div class="total-line" id="totFarRow" style="display:none;"><span>☃️ Farellones — Ingressos</span><span id="totFarLabel" style="font-size:11px;color:#a0d8db;font-style:italic;">Link PIX enviado separado ℹ️</span></div>
+        <div class="total-line" id="totFarTourRow" style="display:none;"><span>☃️ Farellones — Passeio (<span id="totFarPessoasQtd">0</span> pess.)</span><span class="val" id="totFarTour">R$ 0,00</span></div>
+        <div class="total-line" id="totFarRow" style="display:none;"><span style="font-size:12px;padding-left:12px;">↳ Ingressos do parque</span><span id="totFarLabel" style="font-size:11px;color:#a0d8db;font-style:italic;">Link PIX enviado separado ℹ️</span></div>
         <div class="total-line main"><span>TOTAL GERAL</span><span class="val" id="totGeral">R$ 0,00</span></div>
         <div style="font-size:11px; color:#667085; margin-top:8px; padding-top:8px; border-top:1px dashed #d0d5dd; line-height:1.5;">
           ℹ️ <strong>Ingressos externos (Alyan e Farellones)</strong> são faturados separadamente via link PIX e não estão incluídos no total acima. A Full Tour faz a gestão e intermediação diretamente com o parque/vinícola.
@@ -648,6 +666,12 @@ body {
     <p>Obrigado, <strong id="sucNome">—</strong>!<br>Sua inscrição foi registrada com sucesso.<br>Você receberá um e-mail de confirmação em breve.<br>Nossa equipe entrará em contato com o link de pagamento.</p>
     <div class="success-summary" id="sucSummary"></div>
     <p style="color:#888;font-size:12px;">Dúvidas? Fale diretamente pelo <a href="https://wa.me/56967367782" target="_blank" style="color:#0a6f73;font-weight:bold;">WhatsApp +569 67367782</a></p>
+    <div style="margin-top:20px;padding-top:16px;border-top:1px dashed #d0d5dd;">
+      <p style="font-size:12px;color:#888;margin-bottom:10px;">Precisa inscrever mais pessoas?</p>
+      <button onclick="window.location.reload()" style="background:#fff;border:2px solid var(--teal);color:var(--teal-dark);font-size:13px;font-weight:700;padding:10px 22px;border-radius:8px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='var(--teal-light)'" onmouseout="this.style.background='#fff'">
+        ➕ Fazer nova inscrição
+      </button>
+    </div>
   </div>
 
 </div>
@@ -678,7 +702,7 @@ var state = {
   totalPasseios:0, totalIngressos:0, totalGeral:0, valorEntrada:0, saldo:0
 };
 
-var PRICES = { dia1opt1:450, dia1opt2:790, dia2opt1:590, dia2opt2:2150 };
+var PRICES = { dia1opt1:450, dia1opt2:790, dia2opt1:590, dia2opt2:2150, farTour:338 };
 var STEP_NAMES = ["Seus dados","Dia 1 — 28/07","Dia 2 — 29/07","Pessoas & Farellones","Pagamento","Confirmação"];
 var currentStep = 1;
 
@@ -760,7 +784,7 @@ function selectAlyan(val){
 // ── Quantidade ─────────────────────────────────────────────────
 function changeQty(key, delta){
   state.qtd[key] = Math.max(0, (state.qtd[key]||0)+delta);
-  if (key==='d1adults'||key==='d2adults') state.qtd[key]=Math.max(1,state.qtd[key]);
+  if (key==='d1adults'||key==='d2adults'||key==='farPessoas') state.qtd[key]=Math.max(1,state.qtd[key]);
   document.getElementById(key+'Val').textContent = state.qtd[key];
   updateTotals();
 }
@@ -783,10 +807,11 @@ function updateTotals(){
   var d2p = state.dia2==='opt2'?p.dia2opt2:p.dia2opt1;
   var totD1 = d1p * (q.d1adults + (state.dia1==='opt1'?q.d1kids:0));
   var totD2 = d2p * (q.d2adults + (state.dia2==='opt1'?q.d2kids:0));
-  // Ingressos Farellones pagos via link PIX separado — não entram no total do formulário
-  var totFar = 0;
+  // Tour Farellones entra no total; ingressos do parque são PIX separado
+  var farPess = state.farellones==='sim' ? Math.max(1, q.farPessoas||1) : 0;
+  var totFarTour = state.farellones==='sim' ? p.farTour * farPess : 0;
 
-  state.totalPasseios=totD1+totD2; state.totalIngressos=totFar; state.totalGeral=totD1+totD2;
+  state.totalPasseios=totD1+totD2+totFarTour; state.totalIngressos=0; state.totalGeral=totD1+totD2+totFarTour;
   var fmt=function(v){ return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); };
   var d1n={opt1:'Viña + Valparaíso',opt2:'Cousiño Macul + Alyan'};
   var d2n={opt1:'Safari + KidZania',opt2:'VIK + Montes'};
@@ -797,8 +822,12 @@ function updateTotals(){
   document.getElementById('totAlyanRow').style.display=state.dia1==='opt2'?'flex':'none';
   document.getElementById('totAlyanLabel').textContent=state.alyan==='direto'?'Cliente responsável pela reserva':'Link PIX enviado separado ℹ️';
   document.getElementById('totAlyanLabel').style.color=state.alyan==='direto'?'#f0c090':'#a0d8db';
-  document.getElementById('totFarRow').style.display=state.farellones==='sim'?'flex':'none';
-  document.getElementById('totFarLabel').textContent=state.farPag==='direto'?'Cliente responsável pela reserva':'Link PIX enviado separado ℹ️';
+  var farSim = state.farellones==='sim';
+  document.getElementById('totFarTourRow').style.display=farSim?'flex':'none';
+  document.getElementById('totFarPessoasQtd').textContent=farPess;
+  document.getElementById('totFarTour').textContent=fmt(totFarTour);
+  document.getElementById('totFarRow').style.display=farSim?'flex':'none';
+  document.getElementById('totFarLabel').textContent=state.farPag==='direto'?'Cliente responsável pelo ingresso':'Link PIX enviado separado ℹ️';
   document.getElementById('totFarLabel').style.color=state.farPag==='direto'?'#f0c090':'#a0d8db';
   document.getElementById('totGeral').textContent=fmt(state.totalGeral);
   if (state.deposit) selectDeposit(state.deposit);
@@ -886,6 +915,7 @@ async function submitForm(){
     far_pagamento: state.farellones==='sim'?(state.farPag==='pix'?'PIX via Full Tour':'Compra direta no parque'):'N/A',
     far_gratuito:  q.far0,
     far_crianca:   q.far1,
+    far_tour_pessoas: state.farellones==='sim'?Math.max(1,q.farPessoas||1):0,
     far_adulto_geral: q.far2,
     far_adulto_ski:   q.far3,
     alyan:         state.dia1==='opt2'?(state.alyan==='pix'?'PIX via Full Tour':'Compra direta'):'N/A',
@@ -906,10 +936,14 @@ async function submitForm(){
     var data = await res.json();
     if (!data.success) throw new Error(data.error||'Erro desconhecido');
 
-    // Sucesso
+    // Sucesso — bloqueia navegação completamente
     document.querySelectorAll('.card').forEach(function(c){ c.classList.remove('active'); });
     document.getElementById('successCard').classList.add('active');
     document.getElementById('sucNome').textContent = state.nome;
+    // Bloqueia dots e barra de progresso
+    document.querySelectorAll('.step-dot').forEach(function(d){ d.onclick=null; d.style.cursor='default'; });
+    document.getElementById('progressFill').style.width='100%';
+    document.getElementById('stepLabel').textContent='Inscrição enviada ✓';
     var fmt=function(v){ return parseFloat(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); };
     document.getElementById('sucSummary').innerHTML =
       '<strong>'+state.nome+'</strong> — '+state.email+'<br>'
