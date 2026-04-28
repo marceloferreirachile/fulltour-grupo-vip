@@ -225,6 +225,31 @@ body {
 .spinner { width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* Ticket de compra — Step 6 */
+.ticket-person { background: var(--grey); border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: var(--text); line-height: 1.7; }
+.ticket-person strong { color: var(--dark); font-size: 14px; }
+.ticket-box { border: 1.5px solid var(--grey-mid); border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+.tkt-row { padding: 14px 16px; border-bottom: 1px dashed var(--grey-mid); }
+.tkt-row:last-child { border-bottom: none; }
+.tkt-row-muted { opacity: 0.5; }
+.tkt-day { font-size: 10px; font-weight: 800; color: var(--teal-dark); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+.tkt-item { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.tkt-item-left { flex: 1; }
+.tkt-name { font-size: 13px; font-weight: 700; color: var(--dark); display: block; }
+.tkt-calc { font-size: 12px; color: #888; display: block; margin-top: 2px; }
+.tkt-subtotal { font-size: 14px; font-weight: 800; color: var(--teal-dark); white-space: nowrap; }
+.tkt-note { font-size: 11.5px; color: #667085; padding-left: 4px; margin-top: 5px; line-height: 1.5; }
+.tkt-note-warn { font-size: 11.5px; color: #7a4000; padding-left: 4px; margin-top: 3px; }
+.tkt-footer { background: linear-gradient(135deg, var(--navy), #0d2a40); padding: 16px 18px; }
+.tkt-footer-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; font-size: 13px; color: rgba(255,255,255,0.75); border-bottom: 1px solid rgba(255,255,255,0.07); }
+.tkt-footer-row:last-child { border-bottom: none; }
+.tkt-footer-row.main { font-size: 15px; font-weight: 800; color: #fff; padding-top: 10px; border-top: 1px solid rgba(17,161,167,0.4); margin-top: 4px; }
+.tkt-footer-row .tkt-val { font-weight: 700; color: #4dd8dd; }
+.tkt-footer-row.main .tkt-val { font-size: 18px; color: #4dd8dd; }
+/* Success ticket */
+.success-ticket { background: #fff; border: 1.5px solid var(--grey-mid); border-radius: 12px; overflow: hidden; margin: 16px 0; text-align: left; font-size: 13px; }
+.success-ticket .tkt-footer { border-radius: 0; }
+
 @media (max-width: 520px) {
   .deposit-options, .payment-methods { flex-wrap: wrap; }
   .card-body { padding: 20px 16px; }
@@ -242,7 +267,7 @@ body {
 </header>
 
 <div class="deadline-banner">
-  ⏰ Valores válidos para inscrições até <strong>27 de abril de 2026</strong> · Sistema encerra automaticamente · Reabertura 28/04 com valores atualizados
+  ⏰ <span id="bannerTexto">Valores válidos para inscrições até <strong>27 de abril de 2026</strong> · Sistema encerra automaticamente · Reabertura 28/04 com valores atualizados</span>
 </div>
 
 <div class="container">
@@ -350,7 +375,7 @@ body {
           <div class="oc-title">🦁 Parque Safari + KidZania: Aventura em Família!</div>
           <div class="oc-desc">Safari em Rancagua com carro-jaula nos felinos + alimentação de herbívoros. À tarde, KidZania — a cidade governada pelas crianças. Ingresso KidZania por conta do visitante.</div>
           <div class="oc-footer">
-            <span class="oc-price">R$ 590,00 por pessoa</span>
+            <span class="oc-price" id="precoSafari">R$ 700,00 por pessoa</span>
             <span class="oc-badge">✅ Ideal para famílias</span>
           </div>
         </div>
@@ -360,7 +385,7 @@ body {
           <div class="oc-title">🏆 Vinhos de Excelência: VIK & Montes</div>
           <div class="oc-desc">Vinícola VIK — Melhor Vinícola do Mundo (World's 50 Best 2025) — com degustação no Vale de Colchagua. À tarde, Vinícola Montes. Dia exclusivo para adultos.</div>
           <div class="oc-footer">
-            <span class="oc-price">R$ 2.150,00 por pessoa</span>
+            <span class="oc-price" id="precoVIK">R$ 2.450,00 por pessoa</span>
             <span class="oc-badge">🚫 Não permitido para menores</span>
           </div>
         </div>
@@ -426,6 +451,10 @@ body {
             <button class="qty-btn" onclick="changeQty('d2kids',1)">+</button>
           </div>
         </div>
+        <div id="d2-safari-note" style="display:none;margin-top:8px;background:#eaf4fb;border-left:3px solid #2196F3;border-radius:6px;padding:10px 12px;font-size:13px;color:#333;line-height:1.6;">
+          🦁 <strong>Safari:</strong> Entradas incluídas (geral + herbívoros + felinos). Atividades extras por conta do cliente.<br>
+          🏙️ <strong>KidZania:</strong> Entradas <strong>não incluídas</strong> — consultar Álvaro.
+        </div>
       </div>
 
       <!-- Farellones -->
@@ -435,7 +464,8 @@ body {
           <input type="radio" name="farellones" value="sim">
           <div class="oc-check" id="chk-farSim">✓</div>
           <div class="oc-title">Sim, vou ao Farellones! ⛷️</div>
-          <div class="oc-desc" style="font-size:11.5px;">Mesmo preço do parque. Indique os ingressos do seu grupo e escolha como prefere pagar.</div>
+          <div class="oc-desc" style="font-size:11.5px;">Transporte + guia incluídos. Indique os ingressos do seu grupo e escolha como prefere pagar.</div>
+          <div class="oc-footer"><span class="oc-price" id="precoFarellonesCard">R$ 345,00 por pessoa</span></div>
         </div>
         <div class="option-card" id="farNao" onclick="selectOption('farellones','nao','farNao')">
           <input type="radio" name="farellones" value="nao">
@@ -450,14 +480,23 @@ body {
         <!-- Pessoas no passeio (tour) -->
         <div style="background:var(--teal-light);border:1px solid rgba(17,161,167,0.35);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
           <div style="font-size:13px;font-weight:700;color:#0a5a5e;margin-bottom:10px;">🚌 Passeio Farellones — Quantas pessoas vão?</div>
-          <div style="font-size:11.5px;color:#0a6f73;margin-bottom:12px;line-height:1.4;">Valor do passeio (transporte + guia): <strong>R$ 338,00 por pessoa</strong> — mesmo valor para adultos e crianças.</div>
+          <div style="font-size:11.5px;color:#0a6f73;margin-bottom:8px;line-height:1.4;">Valor do passeio (transporte + guia): <strong id="precoFarellones">R$ 345,00 por pessoa</strong> — mesmo valor para adultos e crianças.</div>
+          <div style="font-size:11px;color:#5a7a7c;background:rgba(255,255,255,0.55);border-radius:7px;padding:7px 10px;margin-bottom:12px;line-height:1.5;">🧥 <strong>Roupa de neve não incluída</strong> — o passeio contempla parada para quem precisar alugar (valor não incluído).</div>
           <div class="qty-group" style="margin-bottom:0;">
-            <div class="qty-row">
-              <div><span class="qty-label">Total de pessoas</span><span class="qty-sub">Inclui adultos e crianças</span></div>
+            <div class="qty-row" id="farAdultos-row">
+              <div><span class="qty-label">Adultos</span><span class="qty-sub">Mesmo valor para todas as idades</span></div>
               <div class="qty-controls">
-                <button class="qty-btn" onclick="changeQty('farPessoas',-1)">−</button>
-                <span class="qty-val" id="farPessoasVal">1</span>
-                <button class="qty-btn" onclick="changeQty('farPessoas',1)">+</button>
+                <button class="qty-btn" onclick="changeQty('farAdultos',-1)">−</button>
+                <span class="qty-val" id="farAdultosVal">1</span>
+                <button class="qty-btn" onclick="changeQty('farAdultos',1)">+</button>
+              </div>
+            </div>
+            <div class="qty-row" id="farCriancas-row">
+              <div><span class="qty-label">Crianças</span><span class="qty-sub">Mesmo valor para todas as idades</span></div>
+              <div class="qty-controls">
+                <button class="qty-btn" onclick="changeQty('farCriancas',-1)">−</button>
+                <span class="qty-val" id="farCriancasVal">0</span>
+                <button class="qty-btn" onclick="changeQty('farCriancas',1)">+</button>
               </div>
             </div>
           </div>
@@ -624,31 +663,17 @@ body {
   <div class="card" id="step6">
     <div class="card-header">
       <div class="step-num">Passo 6 de 6</div>
-      <h2>✅ Confirmar inscrição</h2>
-      <p>Revise tudo antes de confirmar.</p>
+      <h2>🎟️ Resumo da inscrição</h2>
+      <p>Confira os detalhes antes de confirmar.</p>
     </div>
     <div class="card-body">
-      <div class="summary-section">
-        <h4>Dados pessoais</h4>
-        <div class="summary-row"><span class="s-label">Nome</span><span class="s-val" id="sumNome">—</span></div>
-        <div class="summary-row"><span class="s-label">E-mail</span><span class="s-val" id="sumEmail">—</span></div>
-        <div class="summary-row"><span class="s-label">WhatsApp</span><span class="s-val" id="sumWapp">—</span></div>
+      <!-- Dados pessoais (compacto) -->
+      <div class="ticket-person">
+        <strong id="sumNome">—</strong><br>
+        <span id="sumEmail">—</span> · <span id="sumWapp">—</span>
       </div>
-      <div class="summary-section">
-        <h4>Atividades</h4>
-        <div class="summary-row"><span class="s-label">Dia 1 — 28/07</span><span class="s-val" id="sumD1">—</span></div>
-        <div class="summary-row"><span class="s-label">Dia 2 — 29/07</span><span class="s-val" id="sumD2">—</span></div>
-        <div class="summary-row"><span class="s-label">Farellones — 30/07</span><span class="s-val" id="sumFar">—</span></div>
-        <div class="summary-row" id="sumAlyanRow" style="display:none;"><span class="s-label">Ticket Alyan</span><span class="s-val" id="sumAlyan">—</span></div>
-        <div class="summary-row" id="sumFarDetailRow" style="display:none;"><span class="s-label">Ingressos Farellones</span><span class="s-val" id="sumFarDetail">—</span></div>
-      </div>
-      <div class="summary-section">
-        <h4>Pagamento</h4>
-        <div class="summary-row"><span class="s-label">Total geral</span><span class="s-val" id="sumTotal">—</span></div>
-        <div class="summary-row"><span class="s-label">Entrada (<span id="sumPct">—</span>)</span><span class="s-val" id="sumEntrada">—</span></div>
-        <div class="summary-row"><span class="s-label">Saldo restante</span><span class="s-val" id="sumSaldo">—</span></div>
-        <div class="summary-row"><span class="s-label">Forma de pagamento</span><span class="s-val" id="sumPay">—</span></div>
-      </div>
+      <!-- Ticket dinâmico -->
+      <div class="ticket-box" id="ticketBody"><!-- gerado por updateSummary() --></div>
       <div class="orange-box" style="margin-bottom:16px;">
         ⏰ <strong>Valores válidos até 27/04/2026.</strong> Após confirmação, nossa equipe entrará em contato com o link de pagamento.
       </div>
@@ -680,14 +705,32 @@ body {
 // ── CONFIG ─────────────────────────────────────────────────────
 var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVObl_S8WPHJV-pJYinsInG0MaqVe5j0ipMXd4yerzoT9bxLk43rqGUXlUIcxj3B0Gzw/exec";
 
-// ── VERIFICAÇÃO DE PRAZO ────────────────────────────────────────
+// ── LOTE AUTOMÁTICO ────────────────────────────────────────────
+var _agora        = new Date();
+var _inicioLote2  = new Date('2026-04-28T00:00:00');
+var _fimLote2     = new Date('2026-05-15T22:00:00');
+var _isLote2      = _agora >= _inicioLote2;
+
+// Atualiza banner
 (function() {
-  var prazo = new Date('2026-04-27T23:59:59');
-  if (new Date() > prazo) {
+  var el = document.getElementById('bannerTexto');
+  if (_isLote2) {
+    el.innerHTML = 'Valores válidos para inscrições de <strong>28 de abril</strong> até <strong>15 de maio de 2026</strong> · Sistema encerra automaticamente · Reabertura 16/05 com valores atualizados';
+  }
+  // Se Lote 2 já encerrou
+  if (_agora > _fimLote2) {
     document.body.innerHTML = '<div style="font-family:Arial,sans-serif;max-width:580px;margin:60px auto;padding:32px;text-align:center;background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.12);">'
       + '<div style="font-size:48px;margin-bottom:16px;">⏰</div>'
       + '<h2 style="color:#1a1a2e;margin:0 0 12px;">Inscrições encerradas</h2>'
-      + '<p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 20px;">O prazo de inscrições do <strong>Grupo VIP Julho 2026</strong> encerrou em 27/04/2026.<br>O segundo lote de inscrições abre em <strong>28/04/2026</strong> com novos valores.</p>'
+      + '<p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 20px;">O prazo de inscrições do <strong>Grupo VIP Julho 2026</strong> encerrou em 15/05/2026.<br>Acompanhe as novidades pelo WhatsApp para saber quando as inscrições serão reabertas.</p>'
+      + '<p style="color:#888;font-size:13px;">Dúvidas? Fale pelo <a href="https://wa.me/56967367782" style="color:#0a6f73;font-weight:bold;">WhatsApp +569 67367782</a></p>'
+      + '</div>';
+  } else if (!_isLote2 && _agora > new Date('2026-04-27T23:59:59')) {
+    // Entre fim do Lote 1 e início do Lote 2 (não deve acontecer, mas por segurança)
+    document.body.innerHTML = '<div style="font-family:Arial,sans-serif;max-width:580px;margin:60px auto;padding:32px;text-align:center;background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.12);">'
+      + '<div style="font-size:48px;margin-bottom:16px;">⏰</div>'
+      + '<h2 style="color:#1a1a2e;margin:0 0 12px;">Inscrições encerradas</h2>'
+      + '<p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 20px;">O prazo de inscrições do <strong>primeiro lote</strong> encerrou em 27/04/2026.<br>O segundo lote de inscrições abre em <strong>28/04/2026</strong> com valores atualizados.</p>'
       + '<p style="color:#888;font-size:13px;">Dúvidas? Fale pelo <a href="https://wa.me/56967367782" style="color:#0a6f73;font-weight:bold;">WhatsApp +569 67367782</a></p>'
       + '</div>';
   }
@@ -697,14 +740,29 @@ var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVObl_S8WPHJV-pJ
 var state = {
   nome:'', email:'', whatsapp:'',
   dia1:null, dia2:null, farellones:null, farPag:null, alyan:null,
-  qtd:{ d1adults:1, d1kids:0, d2adults:1, d2kids:0, farPessoas:1, far0:0, far1:0, far2:0, far3:0 },
+  qtd:{ d1adults:1, d1kids:0, d2adults:1, d2kids:0, farAdultos:1, farCriancas:0, far0:0, far1:0, far2:0, far3:0 },
   deposit:null, payMethod:null,
   totalPasseios:0, totalIngressos:0, totalGeral:0, valorEntrada:0, saldo:0
 };
 
-var PRICES = { dia1opt1:450, dia1opt2:790, dia2opt1:590, dia2opt2:2150, farTour:338 };
+var PRICES = _isLote2
+  ? { dia1opt1:450, dia1opt2:790, dia2opt1:700,  dia2opt2:2450, farTour:345 }
+  : { dia1opt1:450, dia1opt2:790, dia2opt1:590,  dia2opt2:2150, farTour:338 };
 var STEP_NAMES = ["Seus dados","Dia 1 — 28/07","Dia 2 — 29/07","Pessoas & Farellones","Pagamento","Confirmação"];
 var currentStep = 1;
+
+// Atualiza displays de preço nas option cards conforme o lote ativo
+(function() {
+  function fmt(v){ return 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' por pessoa'; }
+  var elSafari    = document.getElementById('precoSafari');
+  var elVIK       = document.getElementById('precoVIK');
+  var elFar       = document.getElementById('precoFarellones');
+  var elFarCard   = document.getElementById('precoFarellonesCard');
+  if (elSafari)   elSafari.textContent   = fmt(PRICES.dia2opt1);
+  if (elVIK)      elVIK.textContent      = fmt(PRICES.dia2opt2);
+  if (elFar)      elFar.textContent      = fmt(PRICES.farTour);
+  if (elFarCard)  elFarCard.textContent  = fmt(PRICES.farTour);
+})();
 
 // ── Navegação ──────────────────────────────────────────────────
 function goTo(n) {
@@ -784,7 +842,7 @@ function selectAlyan(val){
 // ── Quantidade ─────────────────────────────────────────────────
 function changeQty(key, delta){
   state.qtd[key] = Math.max(0, (state.qtd[key]||0)+delta);
-  if (key==='d1adults'||key==='d2adults'||key==='farPessoas') state.qtd[key]=Math.max(1,state.qtd[key]);
+  if (key==='d1adults'||key==='d2adults'||key==='farAdultos') state.qtd[key]=Math.max(1,state.qtd[key]);
   document.getElementById(key+'Val').textContent = state.qtd[key];
   updateTotals();
 }
@@ -795,9 +853,21 @@ function updateStep4Labels(){
   var d2m={opt1:'Safari + KidZania',opt2:'VIK + Montes'};
   document.getElementById('d1label').textContent = d1m[state.dia1]||'—';
   document.getElementById('d2label').textContent = d2m[state.dia2]||'—';
-  document.getElementById('d1kids-row').style.opacity = state.dia1==='opt2'?'0.4':'1';
-  document.getElementById('d2kids-row').style.opacity = state.dia2==='opt2'?'0.4':'1';
-  document.getElementById('alyanSection').style.display = state.dia1==='opt2'?'block':'none';
+  // Crianças Dia 1 — desabilitar botões se opt2
+  var d1opt2 = state.dia1==='opt2';
+  document.getElementById('d1kids-row').style.opacity = d1opt2?'0.4':'1';
+  document.querySelectorAll('#d1kids-row .qty-btn').forEach(function(b){ b.disabled = d1opt2; b.style.cursor = d1opt2?'not-allowed':'pointer'; });
+  if(d1opt2){ state.qtd.d1kids=0; document.getElementById('d1kidsVal').textContent='0'; }
+
+  // Crianças Dia 2 — desabilitar botões se opt2
+  var d2opt2 = state.dia2==='opt2';
+  document.getElementById('d2kids-row').style.opacity = d2opt2?'0.4':'1';
+  document.querySelectorAll('#d2kids-row .qty-btn').forEach(function(b){ b.disabled = d2opt2; b.style.cursor = d2opt2?'not-allowed':'pointer'; });
+  if(d2opt2){ state.qtd.d2kids=0; document.getElementById('d2kidsVal').textContent='0'; }
+  // Aviso Safari/KidZania — visível apenas na opt1
+  document.getElementById('d2-safari-note').style.display = d2opt2?'none':'block';
+
+  document.getElementById('alyanSection').style.display = d1opt2?'block':'none';
 }
 
 // ── Totais ─────────────────────────────────────────────────────
@@ -808,7 +878,7 @@ function updateTotals(){
   var totD1 = d1p * (q.d1adults + (state.dia1==='opt1'?q.d1kids:0));
   var totD2 = d2p * (q.d2adults + (state.dia2==='opt1'?q.d2kids:0));
   // Tour Farellones entra no total; ingressos do parque são PIX separado
-  var farPess = state.farellones==='sim' ? Math.max(1, q.farPessoas||1) : 0;
+  var farPess = state.farellones==='sim' ? (Math.max(1, q.farAdultos||1) + (q.farCriancas||0)) : 0;
   var totFarTour = state.farellones==='sim' ? p.farTour * farPess : 0;
 
   state.totalPasseios=totD1+totD2+totFarTour; state.totalIngressos=0; state.totalGeral=totD1+totD2+totFarTour;
@@ -856,39 +926,89 @@ function selectPay(method){
 }
 
 // ── Summary ────────────────────────────────────────────────────
-function updateSummary(){
+function buildTicketHTML(){
   var fmt=function(v){ return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); };
   var d1n={opt1:'Viña del Mar + Valparaíso',opt2:'Cousiño Macul + Alyan Sunset'};
   var d2n={opt1:'Safari + KidZania',opt2:'VIK + Montes'};
+  var d1p={opt1:PRICES.dia1opt1,opt2:PRICES.dia1opt2};
+  var d2p={opt1:PRICES.dia2opt1,opt2:PRICES.dia2opt2};
   var q=state.qtd;
+  var h='';
+
+  // ── Dia 1 ──
+  var p1=d1p[state.dia1]||0;
+  var sub1=q.d1adults*p1;
+  var kids1=(state.dia1==='opt1'&&q.d1kids>0)?' + '+q.d1kids+' criança(s)':'';
+  h+='<div class="tkt-row">';
+  h+='<div class="tkt-day">Dia 1 — 28/07</div>';
+  h+='<div class="tkt-item">';
+  h+='<div class="tkt-item-left"><span class="tkt-name">🏖️ '+d1n[state.dia1]+'</span>';
+  h+='<span class="tkt-calc">'+q.d1adults+' adulto(s)'+kids1+' × '+fmt(p1)+'</span></div>';
+  h+='<span class="tkt-subtotal">'+fmt(sub1)+'</span>';
+  h+='</div>';
+  if (state.dia1==='opt2'){
+    var alyanLabel=state.alyan==='pix'?'🔗 Link PIX via Full Tour':'Compra direta no site';
+    h+='<div class="tkt-note">🍷 <strong>Alyan Sunset:</strong> Ingresso — '+alyanLabel+'</div>';
+  }
+  h+='</div>';
+
+  // ── Dia 2 ──
+  var p2=d2p[state.dia2]||0;
+  var sub2=q.d2adults*p2;
+  var kids2=(state.dia2==='opt1'&&q.d2kids>0)?' + '+q.d2kids+' criança(s)':'';
+  h+='<div class="tkt-row">';
+  h+='<div class="tkt-day">Dia 2 — 29/07</div>';
+  h+='<div class="tkt-item">';
+  h+='<div class="tkt-item-left"><span class="tkt-name">🌿 '+d2n[state.dia2]+'</span>';
+  h+='<span class="tkt-calc">'+q.d2adults+' adulto(s)'+kids2+' × '+fmt(p2)+'</span></div>';
+  h+='<span class="tkt-subtotal">'+fmt(sub2)+'</span>';
+  h+='</div>';
+  if (state.dia2==='opt1'){
+    h+='<div class="tkt-note">🦁 <strong>Safari:</strong> Entradas incluídas (geral + herbívoros + felinos). Atividades extras por conta do cliente.</div>';
+    h+='<div class="tkt-note tkt-note-warn">🏙️ <strong>KidZania:</strong> Entradas <strong>não incluídas</strong> — consultar Álvaro.</div>';
+  }
+  h+='</div>';
+
+  // ── Farellones ──
+  if (state.farellones==='sim'){
+    var farAdultos=Math.max(1,q.farAdultos||1);
+    var farCriancas=q.farCriancas||0;
+    var farPess=farAdultos+farCriancas;
+    var subFar=farPess*PRICES.farTour;
+    h+='<div class="tkt-row">';
+    h+='<div class="tkt-day">Farellones — 30/07</div>';
+    h+='<div class="tkt-item">';
+    h+='<div class="tkt-item-left"><span class="tkt-name">☃️ Transporte a Farellones</span>';
+    h+='<span class="tkt-calc">'+farAdultos+' adulto(s) + '+farCriancas+' criança(s) × '+fmt(PRICES.farTour)+'/px</span></div>';
+    h+='<span class="tkt-subtotal">'+fmt(subFar)+'</span>';
+    h+='</div>';
+    var fd=[];
+    if(q.far0>0) fd.push(q.far0+' gratuito(s)');
+    if(q.far1>0) fd.push(q.far1+' criança(s) 1m–1,20m');
+    if(q.far2>0) fd.push(q.far2+' adulto(s) geral');
+    if(q.far3>0) fd.push(q.far3+' adulto(s) ski/snow');
+    if(fd.length) h+='<div class="tkt-note">↳ <strong>Ingressos:</strong> '+fd.join(', ')+'</div>';
+    var farPagLabel=state.farPag==='pix'?'🔗 Link PIX enviado pela Full Tour':'Compra direta no parque';
+    h+='<div class="tkt-note">↳ <strong>Pagamento:</strong> '+farPagLabel+'</div>';
+    h+='</div>';
+  }
+
+  // ── Rodapé financeiro ──
+  h+='<div class="tkt-footer">';
+  h+='<div class="tkt-footer-row"><span>Total geral</span><span class="tkt-val">'+fmt(state.totalGeral)+'</span></div>';
+  h+='<div class="tkt-footer-row"><span>Entrada ('+state.deposit+'%)</span><span class="tkt-val">'+fmt(state.valorEntrada)+'</span></div>';
+  h+='<div class="tkt-footer-row"><span>Valor restante</span><span class="tkt-val">'+fmt(state.saldo)+'</span></div>';
+  h+='<div class="tkt-footer-row main"><span>Forma de pagamento</span><span class="tkt-val">'+(state.payMethod||'—')+'</span></div>';
+  h+='</div>';
+
+  return h;
+}
+
+function updateSummary(){
   document.getElementById('sumNome').textContent  = state.nome;
   document.getElementById('sumEmail').textContent = state.email;
   document.getElementById('sumWapp').textContent  = state.whatsapp;
-  document.getElementById('sumD1').textContent    = (d1n[state.dia1]||'—')+' — '+q.d1adults+' adultos'+(state.dia1==='opt1'&&q.d1kids?' + '+q.d1kids+' crianças':'');
-  document.getElementById('sumD2').textContent    = (d2n[state.dia2]||'—')+' — '+q.d2adults+' adultos'+(state.dia2==='opt1'&&q.d2kids?' + '+q.d2kids+' crianças':'');
-  var farPagLabel = state.farPag==='pix'?'PIX via Full Tour (link Nautt, sem IOF)':'Compra direta no parque (IOF + sem garantia)';
-  document.getElementById('sumFar').textContent = state.farellones==='sim'?('Sim — '+farPagLabel):'Não participa';
-
-  if (state.farellones==='sim'){
-    var farDetail = [];
-    if (q.far0>0) farDetail.push(q.far0+' gratuito(s)');
-    if (q.far1>0) farDetail.push(q.far1+' criança(s) 1m–1,20m');
-    if (q.far2>0) farDetail.push(q.far2+' adulto(s) geral');
-    if (q.far3>0) farDetail.push(q.far3+' adulto(s) ski/snow');
-    if (farDetail.length){
-      document.getElementById('sumFarDetailRow').style.display='flex';
-      document.getElementById('sumFarDetail').textContent = farDetail.join(', ');
-    }
-  }
-  if (state.dia1==='opt2'){
-    document.getElementById('sumAlyanRow').style.display='flex';
-    document.getElementById('sumAlyan').textContent = state.alyan==='pix'?'PIX via Full Tour (link Nautt, sem IOF)':'Compra direta no site (IOF + sem garantia)';
-  }
-  document.getElementById('sumTotal').textContent   = fmt(state.totalGeral);
-  document.getElementById('sumPct').textContent     = state.deposit+'%';
-  document.getElementById('sumEntrada').textContent = fmt(state.valorEntrada);
-  document.getElementById('sumSaldo').textContent   = fmt(state.saldo);
-  document.getElementById('sumPay').textContent     = state.payMethod||'—';
+  document.getElementById('ticketBody').innerHTML = buildTicketHTML();
 }
 
 // ── Submit → Google Sheets via Apps Script ─────────────────────
@@ -899,7 +1019,9 @@ async function submitForm(){
 
   var q=state.qtd;
   var d1n={opt1:'Viña del Mar + Valparaíso (R$ 450/px)',opt2:'Cousiño Macul + Alyan Sunset (R$ 790/px)'};
-  var d2n={opt1:'Safari + KidZania (R$ 590/px)',opt2:'VIK + Montes (R$ 2.150/px)'};
+  var d2n = _isLote2
+    ? {opt1:'Safari + KidZania (R$ 700/px)',opt2:'VIK + Montes (R$ 2.450/px)'}
+    : {opt1:'Safari + KidZania (R$ 590/px)',opt2:'VIK + Montes (R$ 2.150/px)'};
 
   var payload = {
     nome:          state.nome,
@@ -915,7 +1037,9 @@ async function submitForm(){
     far_pagamento: state.farellones==='sim'?(state.farPag==='pix'?'PIX via Full Tour':'Compra direta no parque'):'N/A',
     far_gratuito:  q.far0,
     far_crianca:   q.far1,
-    far_tour_pessoas: state.farellones==='sim'?Math.max(1,q.farPessoas||1):0,
+    far_tour_adultos:  state.farellones==='sim'?Math.max(1,q.farAdultos||1):0,
+    far_tour_criancas: state.farellones==='sim'?(q.farCriancas||0):0,
+    far_tour_pessoas:  state.farellones==='sim'?(Math.max(1,q.farAdultos||1)+(q.farCriancas||0)):0,
     far_adulto_geral: q.far2,
     far_adulto_ski:   q.far3,
     alyan:         state.dia1==='opt2'?(state.alyan==='pix'?'PIX via Full Tour':'Compra direta'):'N/A',
@@ -944,13 +1068,10 @@ async function submitForm(){
     document.querySelectorAll('.step-dot').forEach(function(d){ d.onclick=null; d.style.cursor='default'; });
     document.getElementById('progressFill').style.width='100%';
     document.getElementById('stepLabel').textContent='Inscrição enviada ✓';
-    var fmt=function(v){ return parseFloat(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); };
     document.getElementById('sucSummary').innerHTML =
-      '<strong>'+state.nome+'</strong> — '+state.email+'<br>'
-      +'📅 Dia 1: '+(d1n[state.dia1]||'—')+'<br>'
-      +'📅 Dia 2: '+(d2n[state.dia2]||'—')+'<br>'
-      +'☃️ Farellones: '+(state.farellones==='sim'?'Sim':'Não')+'<br>'
-      +'💰 Total: '+fmt(state.totalGeral)+' | Entrada: '+fmt(state.valorEntrada)+' ('+state.deposit+'%)';
+      '<div class="ticket-person"><strong>'+state.nome+'</strong><br>'
+      +'<span>'+state.email+'</span> · <span>'+state.whatsapp+'</span></div>'
+      +'<div class="success-ticket">'+buildTicketHTML()+'</div>';
     window.scrollTo({top:0,behavior:'smooth'});
 
   } catch(err){
